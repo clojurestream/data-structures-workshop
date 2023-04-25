@@ -152,7 +152,27 @@ v
 ;; Write a function called vth that can manually retrieve the nth element from a vector that contains
 ;; between 1057 and 32800 elements. i.e. There are 3 levels.
 
-;; _Solution goes here_
+;; A Solution:
+(defn vth
+  [v n]
+  ;; check that the offset is not out of range
+  (when (< n (count v))
+    ;; get the offset in the root
+    (let [first-level (int (/ n 1024))
+          ;; record the remaining offset
+          n2 (mod n 1024)
+          ;; the offset in the second level of the tree
+          second-level (int (/ n2 32))
+          ;; the final offset
+          third-level (mod n2 32)]
+      ;; check if the offset is beyond the range of the first level
+      (if (or (> first-level 32)
+              ;; or the second level offset is a nil node
+              (nil? (-> v .root .array (nth first-level) .array (nth second-level))))
+        ;; this indicates that the offset is beyond the current data and inside the tail
+        (-> v .tail (nth third-level))
+        ;; otherwise, traverse down the tree to the offset
+        (-> v .root .array (nth first-level) .array (nth second-level) .array (nth third-level))))))
 
 (vth vec1057 500)
 ;; 500

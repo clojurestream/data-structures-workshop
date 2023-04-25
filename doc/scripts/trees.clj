@@ -93,7 +93,30 @@
 
 [[5, [1, nil, [3, nil, nil]], [9, nil, nil]]]
 
-;; _Solution goes here_
+
+;; A Solution:
+(defn put!
+  [tree value]
+  (if-not (root tree)
+    ;; if empty, create a new tree with just one node
+    (set-root! tree (node value))
+    ;; iterate down the branches
+    (loop [current-node (root tree)]
+      ;; read the number at the current node
+      (let [current-value (data current-node)]
+        (if (= current-value value)
+          ;; when equal to the number being inserted, then do nothing and return.
+          tree
+          ;; determine the side. Smaller goes to the left, larger to the right.
+          (let [side (if (< value current-value) :left :right)]
+            (if-let [child-node (child current-node side)]
+              ;; if a child node exists on that side, step down and repeat
+              (recur child-node)
+              ;; no child on the selected side, so create a leaf node and insert it
+              (do
+                (set-child! current-node side (node value))
+                ;; return the root of the tree
+                tree))))))))
 
 ;; Try it out...
 
@@ -114,7 +137,17 @@
 ;; Calling `(t-seq t)` should return `(1 3 5 9)`
 
 
-;; _Solution goes here_
+;; A Solution:
+(defn as-seq
+  [node]
+  (and node
+       (concat (as-seq (left node))
+               [(data node)]
+               (as-seq (right node))))) 
+
+(defn t-seq
+  [tree]
+  (as-seq (root tree))) 
 
 (t-seq t)
 
@@ -177,13 +210,24 @@
 ;; #### Exercise:
 ;; Write a function `utree` that creates a tree from a seq parameter.
 
-;; _Solution goes here_
+;; A solution:
+(defn utree [s] (reduce put nil s))
 
 ;; #### Exercise:
 ;; Write a function called `tcontains?` which checks if a value has been stored in the tree. This is the same operation
 ;; as `clojure.core/contains?`
 
-;; _Solution goes here_
+;; A solution:
+(defn tcontains?
+  [node value]
+  (and node   ;; test if the tree rooted at `node` is not empty
+       ;; look at the data for the current node
+       (let [v (data node)]
+         (or
+           ;; if the data node data is the same as what is being looked for, then return true
+          (= value v)
+          ;; otherwise, recurse into the left child branch if the value is smaller, or the right if larger
+          (recur (if (< value v) (left n) (right node)))))))
 
 (def t (utree [5 1 9]))
 (tcontains? t 1)
@@ -315,7 +359,12 @@
 ;; #### Exercise:
 ;; Write a `max-depth` function to return the maximum depth of the rb-tree. Hint: use recursion.
 
-;; _Solution goes here_
+;; A Solution:
+(defn max-depth
+  [n]
+  (if n
+    (inc (max (max-depth (left n)) (max-depth (right n))))
+    0))
 
 ;; The maximum depth can indicate that a tree is relatively balanced. A perfectly balanced tree
 ;; ought to be about the log2 of the number of items. Red/Black trees do not balance perfectly, but we should
@@ -381,7 +430,18 @@
 ;; Write `tget`: a function that adds to the `tcontains?` function to search for a given key,
 ;; returning the associated value.
 
-;; _Solution goes here_
+;; A solution:
+(defn tget
+  [node key]
+  ;; return nil for an empty tree
+  (and node
+       ;; compare the value at this node to the key being searched for
+       (let [c (compare key (nkey node))]
+         (if (zero? c)
+           ;; when the node contains the required key, return the associated value
+           (value node)
+           ;; key not at this node, so look in the children, going left for smaller, right for larger.
+           (recur (if (< c 0) (left node) (right node)))))))
 
 ;; The following map of labels to numbers can be used to demonstrate this function:
 
@@ -403,7 +463,9 @@
 ;; Implement the `tkeys` and `tvals` functions that return the keys and values of this tree set as seqs.
 ;; Hint: you can use the `as-seq` from above.
 
-;; _Solution goes here_
+;; A Solution:
+(defn tkeys [tree] (map first (as-seq tree)))
+(defn tvals [tree] (map second (as-seq tree)))
 
 (tkeys numbers)
 (tvals numbers)
