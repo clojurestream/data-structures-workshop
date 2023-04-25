@@ -124,7 +124,22 @@ words
 ;; #### Exercise
 ;; Rewrite `insert!` and `contains-object?` to use a linked list at each array location
 
-;; _Solution goes here_
+;; A Solution:
+(defn insert!
+  [arr s]
+  (let [pos (array-location (count arr) s)
+        existing-list (nth arr pos)]
+    (if (some #(= s %) existing-list) ;; search the list
+      arr  ;; already there, so just return the original array
+      (aset arr pos (cons s existing-list))))) ;; add to the list, and put this back in the array
+
+(defn contains-object?
+  [arr s]
+  ;; find the list at the location in the array
+  (let [found (nth arr (array-location (count arr) s))]
+    ;; search the list
+    (some #(= s %) found)))
+
 
 ;; Let's test this by repopulate the array of words, and adding "apple":
 (def words (object-array 10))
@@ -242,8 +257,10 @@ words50
 
 ;; #### Exercise
 ;; Rewrite `array-location` to use the `hash` function
-
-;; _Solution goes here_
+;; A Solution:
+(defn array-location
+  [size s]
+  (mod (hash s) size))
 
 ;; When using a REPL, the `insert` and `contains-object?` functions will pick up this new version of `array-location`
 ;; (defn insert!
@@ -293,7 +310,29 @@ words50
     (aset p 1 v)
     p))
 
-;; _Solution goes here_
+;; A Solution:
+(defn insert-map!
+  [arr k v]
+  ;; get the location in the array
+  (let [pos (array-location (count arr) k)
+        ;; get the existing data at that location
+        existing (nth arr pos)]
+    ;; check the first of each pair, to see if it matches the key
+    (if-let [[fk fv] (first (filter #(= k (first %)) existing))]
+      ;; see if the value is changing
+      (if (= fv v)
+        arr  ;; no change
+        ;; otherwise, remove the old pair, and add the new one
+        (aset arr pos (cons (pair k v) (remove #(= k (first %)) existing))))
+      ;; the key is not there, so just add the pair
+      (aset arr pos (cons (pair k v) existing)))))
+
+(defn get-map
+  [arr k]
+  ;; find the existing list of pairs
+  (let [found (nth arr (array-location (count arr) k))]
+    ;; search the list for the matching key, then return the value
+    (second (first (filter #(= k (first %)) found)))))
 
 ;; Let's test this out with an array of size 50:
 (def map-array (object-array 50))
@@ -321,7 +360,10 @@ map-array
 ;; Write a `to-seq` function that will convert the hashmap array to a seq of pairs.
 ;; Convert these pairs to 2 element vectors.
 
-;; _Solution goes here_
+;; A Solution:
+(defn to-seq
+  [arr]
+  (mapcat #(map vec %) arr))
 
 ;; Apply this to the map-array:
 (to-seq map-array)
@@ -330,7 +372,16 @@ map-array
 ;; Write a `map-keys` function and a `map-vals` function to duplicate the
 ;; `keys` and `vals` functions for maps:
 
-;; _Solution goes here_
+;; A Solution:
+(defn map-keys
+  [arr]
+  (map first (to-seq arr)))
+
+(defn map-vals
+  [arr]
+  (map second (to-seq arr)))
+
+;; Not all of the exercises have to be hard!
 
 ;; ## Immutability
 ;; In order to follow how to make these structures immutable, let's turn to Tree structures.
@@ -345,7 +396,32 @@ map-array
 ;; Write the functions `insert` and `get-map` to duplicate the previous functionality, but
 ;; now the hashmap is in a vector, and the operations must be immutable.
 
-;; _Solution goes here_
+;; A solution. This includes all operations:
+
+(defn location
+  [size s]
+  (mod (hash s) size))
+
+(defn insert
+  ;; accept a key/value as a pair
+  ([vctr [k v]] (insert vctr k v))
+  ;; accept the key and value as separate arguments
+  ([vctr k v]
+   (let [pos (location (count vctr) k)
+         existing (nth vctr pos)]
+     (if-let [[fk fv] (first (filter #(= k (first %)) existing))]
+       (if (= fv v)
+         vctr
+         (assoc vctr pos (cons [k v] (remove #(= k (first %)) existing))))
+       (assoc vctr pos (cons [k v] existing))))))
+
+(defn get-map
+  [vctr k]
+  (let [found (nth vctr (location (count vctr) k))]
+    (second (first (filter #(= k (first %)) found)))))
+
+;; Neither the `location` not the `get-map` function needed to change.
+;; only the `insert` function changed, to use `assoc` rather than `aset`
 
 ;; Initialize a vector at the full width, full of nils:
 (def vctr (vec (repeat 50 nil)))
