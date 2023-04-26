@@ -473,6 +473,6 @@
 ;; Another approach to sets is to use maps and associate keys to themselves. This makes both the
 ;; key and the value the same thing. Remember that in the Java memory model, the string does not
 ;; appear twice in the array. Instead, a _reference_ to the string is stored twice, which is less
-;; expensive.. This map of objects to themselves is the approach that Java uses for implementing Hashsets.
+;; expensive. This map of objects to themselves is the approach that Java uses for implementing Hashsets.
 
 ;; Now that we know about immutable trees, we can build Vectors
