@@ -227,7 +227,7 @@
            ;; if the data node data is the same as what is being looked for, then return true
           (= value v)
           ;; otherwise, recurse into the left child branch if the value is smaller, or the right if larger
-          (recur (if (< value v) (left n) (right node)))))))
+          (recur (if (< value v) (left n) (right node))) value))))
 
 (def t (utree [5 1 9]))
 (tcontains? t 1)
