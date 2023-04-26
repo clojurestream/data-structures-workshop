@@ -15,3 +15,9 @@ Clojure CLI version 1.11.1.1224
 ```
 
 [install-clojure]: https://github.com/babashka/babashka#installation
+
+## Workshop Feedback
+
+At the end of the workshop, please [provide short feedback][feedback-form]
+
+[feedback-form]: https://forms.gle/E9q8gwyW7tVfHkJt9
