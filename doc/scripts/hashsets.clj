@@ -432,7 +432,7 @@ hm
 (nth (-> hm .root .array) (inc (* 2 5)))
 ;; 8
 
-;; But this array is constrained to not get too large. This leads to collisions before long, so wwhat happens
+;; But this array is constrained to not get too large. This leads to collisions before long, so what happens
 ;; when this happens?
 ;; In this case, another tree node will be placed in that location. We can see this if we start the range at 0:
 
@@ -467,7 +467,7 @@ hm
 ;; clojure.lang.PersistentHashMap$ArrayNode
 
 ;; These nodes have no key/value pairs, but instead hold just the structures where those values collide. The
-;; arrays for these nodes are always sized at 32::
+;; arrays for these nodes are always sized at 32:
 (-> hb .root .array count)
 ;; 32
 
