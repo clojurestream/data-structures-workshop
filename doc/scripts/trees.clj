@@ -211,7 +211,7 @@
 ;; Red/Black trees have an extra value associated with each node: the color. This is either red or black.
 ;; All nodes being inserted start out as red.
 (defn rb-node
-  ([data] (node data nil nil :red))
+  ([data] (rb-node data nil nil :red))
   ([data a b color]
    (let [p (object-array 4)]
      (aset p 0 data)
@@ -264,7 +264,7 @@
 ;; slightly more operations, but has the benefit of much simpler operations.
 ;; Again, notice how mutation is avoided. Instead, nodes are read, and then entirely new nodes are created
 ;; with the appropriate values.
-;; TODO: Diagram from Okasaki
+;; file:../../images/rb.html
 (defn balance
   [node]
   (let [value (data node)
