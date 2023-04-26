@@ -441,7 +441,7 @@
            ;; when the node contains the required key, return the associated value
            (value node)
            ;; key not at this node, so look in the children, going left for smaller, right for larger.
-           (recur (if (< c 0) (left node) (right node)))))))
+           (recur (if (< c 0) (left node) (right node)) key)))))
 
 ;; The following map of labels to numbers can be used to demonstrate this function:
 
